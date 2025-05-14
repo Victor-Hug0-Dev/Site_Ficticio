@@ -7,4 +7,5 @@ class User(models.Model):
     password = models.TextField()
 
     def __str__(self):
-        return f"Post: {self.title}"
+        return f"Post: User created"
+        

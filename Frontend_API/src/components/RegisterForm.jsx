@@ -1,56 +1,48 @@
 import { useState } from "react";
 import axios from "axios";
 
-// form registrar
 function RegisterForm({ onRegister }) {
-  const [user_name, setUserName] = useState('');
+  const [username, setUserName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState('');
 
-  // Mostrar a senha
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
 
-  // Função para registrar o usuário
+  // Adicionando a função handleRegister que estava faltando
   const handleRegister = async (e) => {
     e.preventDefault();
 
     try {
-      // Fazendo a requisição com axios
       const response = await axios.post(
-        'http://192.168.0.7:8000/api/user/', 
+        'http://192.168.0.4:8000/api/register/',
         {
-          user_name,
-          email,
-          password,
+          username: username, // <- aqui corrigido!
+          email: email,
+          password: password
         },
         {
           headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json', // Mudança para 'application/json'
-          },
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
         }
       );
 
-      // Exibe a resposta do servidor
       console.log(response.data);
       setMessage('✅ Cadastro realizado com sucesso!');
+      
+      // Limpar os campos após o cadastro
+      setUserName('');
+      setEmail('');
+      setPassword('');
     } catch (error) {
-      // Exibe erro caso a requisição falhe
-      console.error(error);
+      console.error('Erro ao cadastrar:', error.response);
       setMessage('❌ Erro ao cadastrar usuário.');
     }
-
-    // estrutura para salvar as credenciais ou armazenas de login em react
-    // criar um env para ambiente de teste e produção
-
-    // Limpar os campos após o cadastro
-    setUserName('');
-    setEmail('');
-    setPassword('');
   };
 
   return (
@@ -60,7 +52,7 @@ function RegisterForm({ onRegister }) {
         <input
           type="text"
           placeholder="Digite seu nome completo..."
-          value={user_name}
+          value={username}
           onChange={(e) => setUserName(e.target.value)}
           required
         />

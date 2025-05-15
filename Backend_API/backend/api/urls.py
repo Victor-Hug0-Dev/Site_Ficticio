@@ -1,8 +1,7 @@
 from django.urls import include, path
 
 
-urlpatterns = [
-   path('posts/', include('posts.api.urls')),
+urlpatterns = [   
    path('user/', include('user.api.urls')),
 ]
 

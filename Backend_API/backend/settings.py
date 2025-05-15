@@ -39,21 +39,16 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     #Django rest framework
-    'rest_framework',
-
-    #allauth 
-    'allauth',
-    'allauth.account',
+    'rest_framework',    
 
     #corsheaders
     'corsheaders',
 
-    #API
-    'posts',
+    #API    
     'user',
 ]
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
+CORS_ALLOW_ALL_ORIGINS = True 
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -64,7 +59,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "allauth.account.middleware.AccountMiddleware",  
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -87,7 +81,6 @@ TEMPLATES = [
 
 AUTHENTICATION_BACKENDS = [    
     'django.contrib.auth.backends.ModelBackend',    
-    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
@@ -105,7 +98,11 @@ DATABASES = {
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 20,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ]   
 }
 
 # Password validation

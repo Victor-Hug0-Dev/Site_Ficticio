@@ -1,5 +1,3 @@
-
-from rest_framework.viewsets import ModelViewSet
 from rest_framework import generics
 from .models import User
 from user.api import serializers

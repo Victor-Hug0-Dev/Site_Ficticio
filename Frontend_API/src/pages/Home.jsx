@@ -5,7 +5,7 @@ function Home() {
     <div>
       <h1>Bem-vindo ao Sistema</h1>
       <nav>
-        <Link to="/login">Login</Link> | <Link to="/register">Cadastrar</Link> | <Link to="/dashboard">Dashboard</Link>
+        <Link to="/login">Login</Link> | <Link to="/register">Cadastrar</Link>
       </nav>
     </div>
   );

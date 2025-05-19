@@ -4,10 +4,10 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth import authenticate
-from core.exceptions import ValidationError, NotFound, NotAuthenticated
+from core.exceptions import ValidationError, NotAuthenticated, AuthenticationFailed
 
 
-# ==============================================
+# =============================================='
 # VIEWS DE AUTENTICAÇÃO
 # ==============================================
 
@@ -39,21 +39,15 @@ class CustomLoginView(ObtainAuthToken):
         
         # Verifica se o usuário existe
         if user is None:
-            raise NotFound(
-                    detail='Usuário não encontrado. Verifique o ID fornecido.')
+            raise AuthenticationFailed()
     
         # Verifica se o usuário está ativo
         if not user.is_active:
-            raise ValidationError(
-                    detail='Sua conta está desativada. Contate o suporte para reativar.',
-                    extra_data={'support_email': 'suporte@empresa.com'}
-                )
+            raise ValidationError()
     
         # Verifica se o usuário está autenticado
         if not user.is_authenticated:
-            raise NotAuthenticated(
-                    detail='Usuário não autenticado. Verifique suas credenciais.'
-                )
+            raise NotAuthenticated()
         
         # ================= RESPOSTA DE SUCESSO =================
         

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import LoginForm from "../components/LoginForm";
 import { useNavigate } from "react-router-dom";
-import './LoginPage.css';
+import '../styles/LoginPage.css';
 
 function LoginPage() {
   const [loggedIn, setLoggedIn] = useState(false);

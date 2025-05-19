@@ -16,8 +16,8 @@ function LoginForm({ onLogin }) {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://192.168.0.4:8000/api/auth/login/", {
-        username: email,
+      const response = await axios.post("http://192.168.0.10:8000/api/auth/", {
+        email: email,
         password: password,
       });
 
@@ -77,7 +77,7 @@ function LoginForm({ onLogin }) {
 
       <div className="links">
         <a href="#" className="forgot-password">Esqueceu a senha?</a>
-        <a href="#" className="signup-link">Não tem conta? Cadastre-se</a>
+        <a href="/register" className="signup-link">Não tem conta? Cadastre-se</a>
       </div>
     </form>
   );

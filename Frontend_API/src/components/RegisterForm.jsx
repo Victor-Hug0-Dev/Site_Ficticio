@@ -18,7 +18,7 @@ function RegisterForm({ onRegister }) {
 
     try {
       const response = await axios.post(
-        'http://192.168.0.4:8000/api/register/',
+        'http://192.168.0.10:8000/api/user-register/',
         {
           username: username, // <- aqui corrigido!
           email: email,
@@ -88,7 +88,7 @@ function RegisterForm({ onRegister }) {
       {message && <p style={{ marginTop: '10px' }}>{message}</p>}
 
       <div className="links">
-      <a href="#" className="signup-link">Fazer Login</a>
+      <a href="/login" className="signup-link">Fazer Login</a>
     </div>
     </form>
   );

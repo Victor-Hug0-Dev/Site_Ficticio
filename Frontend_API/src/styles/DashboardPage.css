@@ -1,0 +1,103 @@
+body {
+    font-family: sans-serif;
+    background: #fff;
+    color: #fff; /* Texto branco para contraste */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+.dashboard-layout {
+  display: flex;
+  margin-top: 64px; /* para não sobrepor a AppBar */
+}
+.coluna-cinza{
+  position: fixed;
+  top: 0px; /* altura da AppBar */
+  left: 0;
+  width: 350px;
+  height: 100%;
+  color: white;
+  flex: 1;
+  background: #ccc;
+  padding: 20px;
+  float: left;
+  z-index: 1200;
+  margin-left: 450px; /* se a sidebar tiver largura 200px */
+}
+.menu-posição{
+    margin-right: 300px;
+    float: right;
+}
+.logo-salcomp-redd{
+    background: url("/home/desenv04/Área de trabalho/projeto uea/Site_Ficticio/Frontend_API/src/assets/salcomp-redd.png") no-repeat;
+    width: 500px;
+    height: 65px;
+}
+.sidebar {
+  position: fixed;
+  top: 0px; /* altura da AppBar */
+  left: 0;
+  width: 300px;
+  height: 100%;
+  float: left;
+  margin-left: 480px;
+  margin-top: 40px;
+  z-index: 1300;
+}
+
+.sidebar-menu {
+  width: 290px;
+  list-style: none;
+  float: right;
+  margin-right: 70px;
+}
+
+.sidebar-menu li {
+  margin: 50px 0;
+}
+
+.sidebar-menu li a {
+  position: relative;               /* necessário para o ::before */
+  color: #000;
+  text-decoration: none;
+  font-size: 25px;
+  display: flex;
+  align-items: center;
+  padding-left: 15px;               /* espaço para a barra */
+  transition: all 0.3s ease;
+}
+
+.sidebar-menu li a::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 5px;
+  height: 100%;
+  background-color: #9C291E;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-menu li a:hover {
+  color: #9C291E;
+  transform: translateX(10px);
+}
+
+.sidebar-menu li a:hover::before {
+  opacity: 1; /* exibe a barra ao passar o mouse */
+}
+.posição-user-nb{
+    float: right;
+}
+.novacoluna {
+  width: 300px;
+  height: 200px;
+  background: linear-gradient(to right, #000000, #0000FF);
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}

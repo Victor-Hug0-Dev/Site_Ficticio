@@ -22,7 +22,7 @@ function SuccessPage() {
       }
 
       try {
-        const response = await axios.get("http://192.168.0.4:8000/api/profile/", {
+        const response = await axios.get("http://192.168.0.10:8000/api/user-profile/", {
           headers: {
             'Authorization': `Token ${token}`,
             'Content-Type': 'application/json',

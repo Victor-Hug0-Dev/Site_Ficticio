@@ -6,23 +6,23 @@ from .models import User
 class UserSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'created', 'user_name', 'email', 'password')
+        fields = ('id', 'created', 'username', 'email', 'password')
         
 class UserListSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'created', 'user_name', 'email')
+        fields = ('id', 'created', 'username', 'email')
 
 
 class UserDetailSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'created', 'user_name', 'email')
+        fields = ('id', 'created', 'username', 'email')
         
 class UserRegisterSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ('user_name', 'email', 'password')
+        fields = ('username', 'email', 'password')
         extra_kwargs = {
                 'email': {
                     'validators': [

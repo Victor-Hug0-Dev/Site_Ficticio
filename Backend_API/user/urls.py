@@ -1,5 +1,5 @@
 from django.urls import path
-from user.api import views
+from user import views
 
 urlpatterns = [
     path('listall/', views.UserListViewSet.as_view()),

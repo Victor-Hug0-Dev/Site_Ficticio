@@ -15,9 +15,7 @@ class UserManager(BaseUserManager):
     def create_user(self, email, username, password=None):
         """
         Cria e salva um usuário comum com os dados fornecidos.
-            
-        Raises:
-            ValueError: Se o email não for fornecido
+
         """
         if not email:
             raise ValueError("O email é obrigatório.")

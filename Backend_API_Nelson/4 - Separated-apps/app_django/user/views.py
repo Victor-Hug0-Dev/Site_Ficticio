@@ -2,8 +2,8 @@ from rest_framework import generics, permissions, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import User
-from .serializers import UserSerializer
+from .models import User, Profile
+from .serializers import UserSerializer, ProfileSerializer
 
 
 
@@ -25,7 +25,7 @@ class RegisterUserView(generics.CreateAPIView):
     # para criação de instâncias, então não precisamos sobrescrever métodos
 
 
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
+class UserViewSet(viewsets.ModelViewSet):
     """
     ViewSet para visualização de usuários (somente leitura).
     Fornece ações padrão 'list' e 'retrieve'.
@@ -42,27 +42,11 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class ProfileView(APIView):
-    """
-    View para obtenção do perfil do usuário autenticado.
-    Retorna informações básicas do usuário logado.
-    """
-    
+
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        """
-        Retorna os dados do perfil do usuário autenticado.
-        
-        Args:
-            request: Objeto de requisição HTTP com o usuário autenticado
-            
-        Returns:
-            Response: Dados básicos do perfil do usuário
-        """
-        user = request.user  # Obtém o usuário autenticado
-        
-        return Response({
-            "email": user.email,      # Email do usuário
-            "username": user.username  # Nome de usuário
-            # Você pode adicionar mais campos aqui conforme necessário
-        })
+        user = request.user  # Pegar o User diretamente
+        serializer = ProfileSerializer(user)
+        return Response(serializer.data)
+    

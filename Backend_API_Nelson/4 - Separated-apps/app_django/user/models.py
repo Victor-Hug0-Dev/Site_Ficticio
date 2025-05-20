@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, User
 
 
 # ==============================================
@@ -15,14 +15,6 @@ class UserManager(BaseUserManager):
     def create_user(self, email, username, password=None):
         """
         Cria e salva um usuário comum com os dados fornecidos.
-        
-        Args:
-            email (str): Email do usuário (único)
-            username (str): Nome de usuário (único)
-            password (str, optional): Senha do usuário
-            
-        Returns:
-            User: Instância do usuário criado
             
         Raises:
             ValueError: Se o email não for fornecido
@@ -45,12 +37,7 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, username, password):
         """
         Cria e salva um superusuário com os dados fornecidos.
-        
-        Args:
-            email (str): Email do superusuário
-            username (str): Nome de usuário do superusuário
-            password (str): Senha do superusuário
-            
+
         Returns:
             User: Instância do superusuário criado
         """
@@ -96,3 +83,12 @@ class User(AbstractBaseUser, PermissionsMixin):
             str: Email do usuário
         """
         return self.email
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)  # Vinculo 1:1
+    #bio = models.TextField(blank=True, null=True)
+    #phone = models.CharField(max_length=20, blank=True, null=True)
+
+    def __str__(self):
+        return f"Perfil de {self.user.username}"

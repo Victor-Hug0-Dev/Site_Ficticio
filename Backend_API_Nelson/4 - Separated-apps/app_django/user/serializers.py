@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
 from .models import User
 
 # ==============================================
@@ -13,22 +12,21 @@ class UserSerializer(serializers.ModelSerializer):
     """
 
     password = serializers.CharField(
-        write_only=True,                    # A senha só pode ser escrita, nunca lida na API
-        style={'input_type': 'password'},   # No navegador da API, mostra como campo de senha (****)
-        trim_whitespace=False,              # Não remove espaços em branco (senhas podem começar/terminar com espaço)
-        required=True,                      # Obrigatório no cadastro
-        help_text="Senha do usuário (só é necessária para criação)"     # Texto de ajuda na documentação
+        write_only=True,
+        required=True,
+        style={'input_type': 'password'},
     )
 
     class Meta:
         """
         Classe Meta para configurações do serializador.
         """
-        model = User  # Indica qual modelo Django será serializado
-        fields = ['id', 'email', 'username', 'password']   #Quais campos do modelo serão incluídos
+        model = User
+        fields = ['id', 'email', 'username', 'password', 'is_active']
         extra_kwargs = {
-            'email': {'required': True},    # Torna email obrigatório
-            'username': {'required': True}  # Torna email obrigatório
+            'email': {'required': True},
+            'username': {'required': True},
+            'is_active': {'required': False}
         }
 
     def create(self, validated_data):
@@ -41,16 +39,31 @@ class UserSerializer(serializers.ModelSerializer):
         Returns:
             User: Instância do usuário criado
         """
-        # Utiliza o método create_user do UserManager personalizado
-        user = User.objects.create_user(
-            email=validated_data['email'],
-            username=validated_data['username'],
-            password=validated_data['password']
-        )
-        return user
-    
+        validated_data.pop('is_active', None)
+        return User.objects.create_user(**validated_data)
+
+    def update(self, instance, validated_data):
+        """
+        Atualiza uma instância de usuário existente.
+        
+        Args:
+            instance (User): Instância do usuário a ser atualizada
+            validated_data (dict): Dados validados para atualização
+            
+        Returns:
+            User: Instância do usuário atualizada
+        """
+        if 'password' in validated_data:
+            password = validated_data.pop('password')
+            instance.set_password(password)
+        
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        
+        instance.save()
+        return instance
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username','email']
+        fields = ['id', 'username', 'email']

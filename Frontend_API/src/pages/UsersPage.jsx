@@ -6,9 +6,6 @@ import {
   Grid, 
   Paper, 
   Typography, 
-  Card, 
-  CardContent,
-  Stack,
   Button,
   Table,
   TableBody,
@@ -18,7 +15,11 @@ import {
   TableRow,
   IconButton,
   Avatar,
-  CircularProgress
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material';
 import { 
   People as PeopleIcon,
@@ -34,18 +35,23 @@ function UsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { user } = useAuth();
+  const [deleteDialog, setDeleteDialog] = useState({
+    open: false,
+    userId: null,
+    userName: ''
+  });
+  const { user } = useAuth(); 
 
-  useEffect(() => {
+  useEffect(() => {  //
     const fetchUsers = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token'); //
         if (!token) {
           setError('Usuário não autenticado');
           setLoading(false);
           return;
         }
-
+// integração com backend
         const options = {
           method: 'GET',
           url: 'http://192.168.0.11:8000/api/users/',
@@ -67,6 +73,46 @@ function UsersPage() {
 
     fetchUsers();
   }, []);
+
+  const handleDeleteClick = (userId, userName) => {
+    setDeleteDialog({
+      open: true,
+      userId,
+      userName
+    });
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const form = new FormData();
+
+      const options = {
+        method: 'DELETE',
+        url: `http://192.168.0.11:8000/api/users/${deleteDialog.userId}`,
+        headers: {
+          'Content-Type': 'multipart/form-data; boundary=---011000010111000001101001',
+          'User-Agent': 'insomnia/11.1.0',
+          'Authorization': `Token ${token}`
+        },
+        data: '[form]'
+      };
+
+      const response = await axios.request(options);
+      console.log('Resposta da exclusão:', response.data);
+      
+      // Atualiza a lista de usuários após a exclusão
+      setUsers(users.filter(user => user.id !== deleteDialog.userId));
+      setDeleteDialog({ open: false, userId: null, userName: '' });
+    } catch (error) {
+      console.error('Erro detalhado:', error.response || error);
+      setError('Erro ao deletar usuário. Por favor, tente novamente.');
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialog({ open: false, userId: null, userName: '' });
+  };
 
   if (loading) {
     return (
@@ -92,6 +138,7 @@ function UsersPage() {
         
         <Box sx={{ flexGrow: 1, p: 3, ml: '330px' }}>
           <Grid container spacing={3}>
+            
             {/* Cabeçalho */}
             <Grid item xs={12}>
               <Paper sx={{ 
@@ -135,6 +182,7 @@ function UsersPage() {
                   <Table>
                     <TableHead>
                       <TableRow>
+                        <TableCell>ID</TableCell>
                         <TableCell>Usuário</TableCell>
                         <TableCell>Email</TableCell>
                         <TableCell>Função</TableCell>
@@ -145,6 +193,7 @@ function UsersPage() {
                     <TableBody>
                       {users.map((user) => (
                         <TableRow key={user.id}>
+                          <TableCell>{user.id}</TableCell>
                           <TableCell>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                               <Avatar sx={{ bgcolor: '#BE3124' }}>
@@ -167,24 +216,9 @@ function UsersPage() {
                           </TableCell>
                           <TableCell align="right">
                             <IconButton 
-                              size="small" 
-                              sx={{ 
-                                color: '#BE3124',
-                                '&:hover': {
-                                  bgcolor: 'rgba(190, 49, 36, 0.1)'
-                                }
-                              }}
-                            >
-                              <EditIcon />
-                            </IconButton>
-                            <IconButton 
-                              size="small" 
-                              sx={{ 
-                                color: '#BE3124',
-                                '&:hover': {
-                                  bgcolor: 'rgba(190, 49, 36, 0.1)'
-                                }
-                              }}
+                              onClick={() => handleDeleteClick(user.id, user.name || user.username)}
+                              color="error"
+                              size="small"
                             >
                               <DeleteIcon />
                             </IconButton>
@@ -199,6 +233,27 @@ function UsersPage() {
           </Grid>
         </Box>
       </div>
+
+      {/* Diálogo de Confirmação de Exclusão */}
+      <Dialog
+        open={deleteDialog.open}
+        onClose={handleDeleteCancel}
+      >
+        <DialogTitle>Confirmar Exclusão</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Você tem certeza que deseja excluir o usuário ID {deleteDialog.userId} - {deleteDialog.userName}?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel} color="primary">
+            Cancelar
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="error" variant="contained">
+            Excluir
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

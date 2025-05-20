@@ -74,7 +74,7 @@ function ResponsiveAppBar() {
   };
 
   const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
+    setAnchorElNav(null);         
   };
 
   const handleCloseUserMenu = () => {
@@ -92,7 +92,7 @@ function ResponsiveAppBar() {
       handleCloseUserMenu();
       navigate('/login');
     }
-  };
+};
 
   return (
     <StyledAppBar position="fixed">
@@ -153,14 +153,14 @@ function ResponsiveAppBar() {
               justifyContent: 'center',
               alignItems: 'center'
             }}>
-              {pages.map((page) => (
+            {pages.map((page) => (
                 <NavButton
-                  key={page}
-                  onClick={handleCloseNavMenu}
-                >
-                  {page}
+                key={page}
+                onClick={handleCloseNavMenu}
+              >
+                {page}
                 </NavButton>
-              ))}
+            ))}
             </Box>
           </Box>
         

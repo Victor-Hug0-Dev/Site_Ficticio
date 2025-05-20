@@ -13,6 +13,8 @@ function RegisterPage() {
   return (
 
 <div className="login-container">
+<div className="logo-salcomp-white"></div>
+<div className="separator"></div>
 <div className="title-login">CADASTRO</div>
 <RegisterForm onRegister={handleRegister} />
 </div>

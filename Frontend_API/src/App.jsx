@@ -3,17 +3,16 @@ import { AuthProvider } from "./contexts/AuthContext";
 import Home from "./pages/Home";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-import SuccessPage from "./pages/SuccessPage";
 import DashboardPage from "./pages/DashboardPage";
 import UsersPage from "./pages/UsersPage";
 import { useAuth } from "./contexts/AuthContext";
 
-// Componente de rota privada
+// componente de rota privada
 function PrivateRoute({ children }) {
   const { user } = useAuth();
   
   if (!user) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" />; // redireciona para a página de login se o usuário não estiver autenticado
   }
 
   return children;
@@ -41,14 +40,6 @@ function App() {
               //<PrivateRoute>
                 <UsersPage />
               //</PrivateRoute>
-            }
-          />
-          <Route 
-            path="/success" 
-            element={
-              <PrivateRoute>
-                <SuccessPage />
-              </PrivateRoute>
             }
           />
         </Routes>

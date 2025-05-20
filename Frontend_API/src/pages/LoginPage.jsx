@@ -7,6 +7,8 @@ function LoginPage() {
 
   return (
     <div className="login-container">
+      <div className="logo-salcomp-white"></div>
+      <div className="separator"></div>
       <div className="title-login">LOGIN</div>
       <LoginForm />
     </div>

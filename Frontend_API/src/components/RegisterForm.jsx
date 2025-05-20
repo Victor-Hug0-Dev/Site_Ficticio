@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { PersonAdd as PersonAddIcon } from '@mui/icons-material';
 
 function RegisterForm() {
   const [username, setUserName] = useState('');
@@ -107,7 +108,7 @@ function RegisterForm() {
           className="login-button"
           disabled={loading}
         >
-          {loading ? "CADASTRANDO..." : "CADASTRAR"}
+          {loading ? "CADASTRANDO..." : "CADASTRAR"} <PersonAddIcon style={{ marginLeft: '8px', verticalAlign: 'middle' }} />
         </button>
       </center>
 

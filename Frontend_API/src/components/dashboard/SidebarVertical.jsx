@@ -29,8 +29,8 @@ function SidebarVertical() {
 
   return (
     <div className="sidebar">
-      <div className='logo-salcomp-redd'></div>
-      <ul className="sidebar-menu">
+          <div className='logo-salcomp-redd'></div>
+    <ul className="sidebar-menu">
         {menuItems.map((item) => (
           <li key={item.path}>
             <Link 
@@ -40,9 +40,9 @@ function SidebarVertical() {
               <i className={`bi ${item.icon}`} style={{ fontSize: '30px', marginRight: '10px' }}></i>
               {item.label}
             </Link>
-          </li>
+  </li>
         ))}
-      </ul>
+</ul>
     </div>
   );
 }

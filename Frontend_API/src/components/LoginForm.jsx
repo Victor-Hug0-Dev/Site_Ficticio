@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { Login as LoginIcon } from '@mui/icons-material';
 
 function LoginForm() {
   const [email, setEmail] = useState("");
@@ -82,7 +83,7 @@ function LoginForm() {
           className="login-button"
           disabled={loading}
         >
-          {loading ? "ENTRANDO..." : "ENTRAR"}
+          {loading ? "ENTRANDO..." : "ENTRAR"} <LoginIcon style={{ marginLeft: '8px', verticalAlign: 'middle' }} />
         </button>
       </center>
 

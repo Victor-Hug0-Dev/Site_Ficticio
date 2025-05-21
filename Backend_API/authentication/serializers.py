@@ -23,15 +23,13 @@ class AuthLoginSerializer(serializers.Serializer):
     
     def validate(self, data):      
         email = data.get('email')
-        password = data.get('password')
-        print(email)
-        print(password)
+        password = data.get('password')        
 
-        # Verifique se ambos email e password foram fornecidos
+
         if not email or not password:
             raise serializers.ValidationError("Both email and password are required.")
         
-        user = authenticate(user=email, password=password)
+        user = authenticate(self.context['request'].method, email=email, password=password)
         
         print(user)
         if not user:
@@ -41,3 +39,8 @@ class AuthLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError("User is not active")       
        
         return user
+    
+class ProfileSerializer(AuthSerializer):    
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password')

@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'user',
     'auth_user',
     'corsheaders',
+    'inventory',
 ]
 
 MIDDLEWARE = [

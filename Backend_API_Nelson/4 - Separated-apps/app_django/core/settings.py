@@ -16,6 +16,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+# Configuração para não adicionar barra no final das URLs
+APPEND_SLASH = False
+
 
 # Application definition
 

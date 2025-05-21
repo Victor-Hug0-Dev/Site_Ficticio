@@ -45,50 +45,6 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]  # Requer autenticação para todas as operações
 
-    def update(self, request, *args, **kwargs):
-        """
-        Método para atualização completa (PUT) ou parcial (PATCH) de um usuário.
-        
-        Args:
-            request: Requisição HTTP
-            *args: Argumentos posicionais adicionais
-            **kwargs: Argumentos nomeados adicionais
-            
-        Returns:
-            Response: Resposta com os dados do usuário atualizado
-        """
-        partial = kwargs.pop('partial', False)  # True para PATCH, False para PUT
-        instance = self.get_object()  # Obtém o usuário a ser atualizado
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)  # Valida os dados
-        self.perform_update(serializer)  # Realiza a atualização
-        return Response(serializer.data)
-
-    def partial_update(self, request, *args, **kwargs):
-        """
-        Método para atualização parcial (PATCH) de um usuário.
-        Marca a atualização como parcial e chama o método update.
-        
-        Args:
-            request: Requisição HTTP
-            *args: Argumentos posicionais adicionais
-            **kwargs: Argumentos nomeados adicionais
-            
-        Returns:
-            Response: Resposta com os dados do usuário atualizado
-        """
-        kwargs['partial'] = True
-        return self.update(request, *args, **kwargs)
-
-    def perform_update(self, serializer):
-        """
-        Realiza a atualização do usuário no banco de dados.
-        
-        Args:
-            serializer: Serializer com os dados validados
-        """
-        serializer.save()
-
     @action(detail=True, methods=['post'])
     def change_password(self, request, pk=None):
         """

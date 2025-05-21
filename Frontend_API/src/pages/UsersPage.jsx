@@ -30,31 +30,36 @@ import {
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import SearchIcon from '@mui/icons-material/Search';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
+
 
 function UsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [deleteDialog, setDeleteDialog] = useState({
     open: false,
     userId: null,
     userName: ''
   });
-  const { user } = useAuth(); 
+  const { user } = useAuth();
 
-  useEffect(() => {  //
+  useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const token = localStorage.getItem('token'); //
+        const token = localStorage.getItem('token');
         if (!token) {
           setError('Usuário não autenticado');
           setLoading(false);
           return;
         }
-// integração com backend
+
         const options = {
           method: 'GET',
-          url: 'http://192.168.0.11:8000/api/users/',
+          url: 'http://127.0.0.1:8000//api/users/',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Token ${token}`
@@ -85,23 +90,18 @@ function UsersPage() {
   const handleDeleteConfirm = async () => {
     try {
       const token = localStorage.getItem('token');
-      const form = new FormData();
-
+      
       const options = {
         method: 'DELETE',
-        url: `http://192.168.0.11:8000/api/users/${deleteDialog.userId}`,
+        url: `http://192.168.0.9:8000/user/listall/${deleteDialog.userId}`,
         headers: {
-          'Content-Type': 'multipart/form-data; boundary=---011000010111000001101001',
-          'User-Agent': 'insomnia/11.1.0',
+          'Content-Type': 'application/json',
           'Authorization': `Token ${token}`
-        },
-        data: '[form]'
+        }
       };
 
-      const response = await axios.request(options);
-      console.log('Resposta da exclusão:', response.data);
+      await axios.request(options);
       
-      // Atualiza a lista de usuários após a exclusão
       setUsers(users.filter(user => user.id !== deleteDialog.userId));
       setDeleteDialog({ open: false, userId: null, userName: '' });
     } catch (error) {
@@ -113,6 +113,19 @@ function UsersPage() {
   const handleDeleteCancel = () => {
     setDeleteDialog({ open: false, userId: null, userName: '' });
   };
+
+  // Função para filtrar usuários
+  const filteredUsers = users.filter((user) => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+    
+    return (
+      (user.id && user.id.toString().includes(query)) ||
+      (user.name && user.name.toLowerCase().includes(query)) ||
+      (user.username && user.username.toLowerCase().includes(query)) ||
+      (user.email && user.email.toLowerCase().includes(query))
+    );
+  });
 
   if (loading) {
     return (
@@ -138,8 +151,6 @@ function UsersPage() {
         
         <Box sx={{ flexGrow: 1, p: 3, ml: '330px' }}>
           <Grid container spacing={3}>
-            
-            {/* Cabeçalho */}
             <Grid item xs={12}>
               <Paper sx={{ 
                 p: 3, 
@@ -151,7 +162,9 @@ function UsersPage() {
                   display: 'flex', 
                   justifyContent: 'space-between', 
                   alignItems: 'center', 
-                  mb: 3 
+                  mb: 3,
+                  flexWrap: 'wrap',
+                  gap: 2
                 }}>
                   <Typography variant="h5" sx={{ 
                     fontWeight: 'bold', 
@@ -163,21 +176,38 @@ function UsersPage() {
                     <PeopleIcon sx={{ color: '#BE3124' }} />
                     Gerenciamento de Usuários
                   </Typography>
-                  <Button 
-                    variant="contained" 
-                    startIcon={<AddIcon />}
-                    sx={{ 
-                      bgcolor: '#BE3124',
-                      '&:hover': {
-                        bgcolor: '#9C291E'
-                      }
-                    }}
-                  >
-                    Novo Usuário
-                  </Button>
+
+                  <Box sx={{ display: 'flex', gap: 2 }}>
+                    <TextField 
+                      variant="outlined" 
+                      size="small"
+                      placeholder="Buscar por nome ou e-mail"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <SearchIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                    
+                    <Button 
+                      variant="contained" 
+                      startIcon={<AddIcon />}
+                      sx={{ 
+                        bgcolor: '#BE3124',
+                        '&:hover': {
+                          bgcolor: '#9C291E'
+                        }
+                      }}
+                    >
+                      Novo Usuário
+                    </Button>
+                  </Box>
                 </Box>
 
-                {/* Tabela de Usuários */}
                 <TableContainer>
                   <Table>
                     <TableHead>
@@ -191,7 +221,7 @@ function UsersPage() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {users.map((user) => (
+                      {filteredUsers.map((user) => (
                         <TableRow key={user.id}>
                           <TableCell>{user.id}</TableCell>
                           <TableCell>

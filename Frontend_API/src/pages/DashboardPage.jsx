@@ -35,7 +35,7 @@ function DashboardPage() {
         
         <Box sx={{ flexGrow: 1, p: 3, ml: '330px' }}>
           <Grid container spacing={3}>
-            {/* Cards de Estatísticas */}
+            {/* Cards de Estatísticas INFO FALSAS*/}
             <Grid item xs={12} md={3}>
               <Card sx={{ height: '100%', bgcolor: '#BE3124', color: 'white', borderRadius: '20px'}}>
                 <CardContent>
@@ -168,7 +168,7 @@ function DashboardPage() {
               </Paper>
             </Grid>
 
-            {/* Status do Sistema */}
+            {/* Status do Sistema INFO FALSAS*/}
             <Grid item xs={12}>
               <Paper sx={{ 
                 p: 3, 

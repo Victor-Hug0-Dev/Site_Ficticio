@@ -56,6 +56,7 @@ const UserStatus = styled(Typography)(({ theme }) => ({
   fontSize: '0.875rem',
 }));
 
+//topicos do menu nav bar vermelho
 const pages = ['Produtos', 'Dispositivos', 'FAQ'];
 const settings = ['Meu Perfil', 'Logout'];
 
@@ -169,7 +170,7 @@ function ResponsiveAppBar() {
           <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
             <UserInfo>
               <UserName>Olá, {user?.username || 'Usuário'}</UserName>
-              <UserStatus>Login Aprovado</UserStatus>
+              <UserStatus>Bem vindo(a)!</UserStatus>
             </UserInfo>
 
             <Tooltip title="Configurações do Perfil">
@@ -180,7 +181,7 @@ function ResponsiveAppBar() {
                   sx={{ 
                     width: 40, 
                     height: 40,
-                    border: '2px solid rgba(255, 255, 255, 0.2)'
+                    border: '5px solid rgba(255, 255, 255, 0.2)'
                   }}
                 />
               </IconButton>

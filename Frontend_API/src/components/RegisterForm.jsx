@@ -23,7 +23,7 @@ function RegisterForm() {
 
     try {
       const response = await axios.post(
-        'http://192.168.0.11:8000/api/register/',
+        'http://127.0.0.1:8000//api/register/',
         {
           username,
           email,

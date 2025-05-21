@@ -20,7 +20,7 @@ export function AuthProvider({ children }) {
 
   const fetchUserProfile = async (token) => {
     try {
-      const response = await axios.get("http://192.168.0.11:8000/api/profile/", {
+      const response = await axios.get("http://127.0.0.1:8000//api/profile/", {
         headers: {
           'Authorization': `Token ${token}`,
           'Content-Type': 'application/json',
@@ -42,7 +42,7 @@ export function AuthProvider({ children }) {
     try {
       const options = {
         method: 'POST',
-        url: 'http://192.168.0.11:8000/auth/login/',
+        url: 'http://127.0.0.1:8000//auth/login/',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -83,7 +83,7 @@ export function AuthProvider({ children }) {
 
       const options = {
         method: 'POST',
-        url: 'http://192.168.0.11:8000/auth/logout/',
+        url: 'http://127.0.0.1:8000//auth/logout/',
         headers: {
           Accept: 'application/json',
           Authorization: `Token ${token}`
@@ -111,7 +111,7 @@ export function AuthProvider({ children }) {
 
   const register = async (username, email, password) => {
     try {
-      await axios.post('http://192.168.0.11:8000/api/register/', {
+      await axios.post('http://127.0.0.1:8000//api/register/', {
         username,
         email,
         password

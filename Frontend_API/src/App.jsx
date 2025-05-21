@@ -29,17 +29,17 @@ function App() {
           <Route 
             path="/dashboard" 
             element={
-              //<PrivateRoute>
+              <PrivateRoute>
                 <DashboardPage />
-              //</PrivateRoute>
+              </PrivateRoute>
             }
           />
           <Route 
             path="/usuarios" 
             element={
-              //<PrivateRoute>
+              <PrivateRoute>
                 <UsersPage />
-              //</PrivateRoute>
+              </PrivateRoute>
             }
           />
         </Routes>

@@ -16,9 +16,6 @@ body {
 .menu-posição{
     margin-left: 300px;
 }
-.logo-salcomp-redd{
-    background: url("/home/desenv04/Área de trabalho/projeto uea/Site_Ficticio/Frontend_API/src/assets/salcomp-redd.png") no-repeat;
-}
 .sidebar {
   position: fixed;
   top: 0;

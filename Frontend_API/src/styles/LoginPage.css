@@ -17,16 +17,6 @@ body {
     text-align: center;
     border-radius: 25px;
 }
-
-.logo-salcomp-white {
-    background: url("/home/desenv04/Área de trabalho/projeto uea/Site_Ficticio/Frontend_API/src/assets/salcomp-white.png") no-repeat center center;
-    background-size: contain;
-    width: 280px;
-    height: 50px;
-    margin: 0 auto 25px auto;
-    display: block;
-}
-
 .separator {
     width: 100%;
     height: 3px;

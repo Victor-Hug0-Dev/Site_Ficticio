@@ -3,6 +3,7 @@ import RegisterForm from "../components/RegisterForm";
 import { useNavigate } from "react-router-dom";
 import '../styles/LoginPage.css';
 
+
 function RegisterPage() {
   const navigate = useNavigate();
 

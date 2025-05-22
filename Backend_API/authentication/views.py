@@ -36,9 +36,8 @@ class UserLoginAPIView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)        
         user = serializer.validated_data   
         
-        refresh = RefreshToken.for_user(user)
-        
-        # Prepare a resposta
+        refresh = RefreshToken.for_user(user)        
+    
         response_data = {
             'email': user.email,
             'tokens': {
@@ -50,6 +49,7 @@ class UserLoginAPIView(generics.GenericAPIView):
         return Response(response_data, status=status.HTTP_200_OK)
             
 class UserLogoutAPIView(generics.GenericAPIView):
+    
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
@@ -65,14 +65,10 @@ class UserLogoutAPIView(generics.GenericAPIView):
             return Response({'detail': 'Logout não realizado.'},status=status.HTTP_400_BAD_REQUEST)
         
 class UserProfileAPIView(generics.RetrieveUpdateAPIView):
-    """
-    Get, Update user profile
-    """
 
     queryset = User.objects.all()
-    serializer_class = serializers.ProfileSerializer
-    permission_classes = (AllowAny,)
-    #permission_classes = (IsAuthenticated,)
+    serializer_class = serializers.ProfileSerializer    
+    permission_classes = (IsAuthenticated,)
 
     def get_object(self):
-        return self.request.data
+        return self.request.user

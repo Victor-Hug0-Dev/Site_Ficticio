@@ -1,39 +1,35 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
-from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.contrib.auth import authenticate
-from core.exceptions import ValidationError, NotAuthenticated, AuthenticationFailed
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from django.contrib.auth import login
+from allauth.account.auth_backends import AuthenticationBackend
+from allauth.account.utils import perform_login
+from allauth.account import app_settings as allauth_settings
+from core.exceptions import ValidationError, AuthenticationFailed
 
 
 # =============================================='
 # VIEWS DE AUTENTICAÇÃO
 # ==============================================
 
-class CustomLoginView(ObtainAuthToken):
+class CustomLoginView(APIView):
     """
-    View personalizada para login de usuários.
-    Herda de ObtainAuthToken para fornecer autenticação por token.
-    Permite acesso sem autenticação (AllowAny).
+    View personalizada para login com integração django-allauth
     """
     permission_classes = [AllowAny]
 
     def post(self, request):
-        """
-        Processa a requisição POST para login.
-        
-        Args:
-            request: Objeto de requisição HTTP
-        """
-        
-        username = request.data.get("username")
+ 
+        email = request.data.get("email")
         password = request.data.get("password")
 
-        if not username or not password:
+        if not email or not password:
             raise ValidationError("Usuário e senha são obrigatórios.")
         
-        user = authenticate(username=username, password=password)
+         # Usa o backend de autenticação do allauth
+        auth_backend = AuthenticationBackend()
+        user = auth_backend.authenticate(request, email=email, password=password)
 
         # ================= VERIFICAÇÕES DE SEGURANÇA =================
         
@@ -49,7 +45,16 @@ class CustomLoginView(ObtainAuthToken):
         if not user.is_authenticated:
             raise NotAuthenticated()
         
+        # Verificação de e-mail (se configurado como obrigatório)
+        if allauth_settings.EMAIL_VERIFICATION == 'mandatory':
+            email_address = user.emailaddress_set.filter(email=user.email).first()
+            if not email_address or not email_address.verified:
+                raise ValidationError("E-mail não verificado")
+        
         # ================= RESPOSTA DE SUCESSO =================
+        
+        # Realiza o login completo do allauth (para sessões)
+        perform_login(request, user, email_verification='optional')
         
         # Obtém ou cria um token para o usuário
         token, created = Token.objects.get_or_create(user=user)

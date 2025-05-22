@@ -38,7 +38,9 @@ This secction is still in progress
 This secction is still in progress
 
 ## Links
-This secction is still in progress
+usefull links to futher reading:
+- Django-rest-framework(#https://www.django-rest-framework.org/)
+- simple JWT (#https://django-rest-framework-simplejwt.readthedocs.io/en/latest/)
 
 ## License
 This secction is still in progress

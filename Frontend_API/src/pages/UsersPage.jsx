@@ -1,6 +1,9 @@
 import '../styles/DashboardPage.css';
 import ResponsiveAppBar from '../components/dashboard/ResponsiveAppBar';
 import SidebarVertical from '../components/dashboard/SidebarVertical';
+import EditUserDialog from '../components/users/EditUserDialog';
+import NewUserDialog from '../components/users/NewUserDialog';
+import DeleteUserDialog from '../components/users/DeleteUserDialog';
 import { 
   Box, 
   Grid, 
@@ -16,27 +19,20 @@ import {
   IconButton,
   Avatar,
   CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   TextField,
-  Pagination
+  Pagination,
+  InputAdornment
 } from '@mui/material';
 import { 
   People as PeopleIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   Add as AddIcon,
-  Email as EmailIcon,
-  Lock as LockIcon
+  Search as SearchIcon
 } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
-import SearchIcon from '@mui/icons-material/Search';
-import InputAdornment from '@mui/material/InputAdornment';
-
 
 function UsersPage() {
   const [users, setUsers] = useState([]);
@@ -56,6 +52,13 @@ function UsersPage() {
     email: '',
     password: ''
   });
+  const [editUserDialog, setEditUserDialog] = useState({
+    open: false,
+    userId: null,
+    name: '',
+    email: '',
+    password: ''
+  });
   const { user } = useAuth();
 
   useEffect(() => {
@@ -70,7 +73,7 @@ function UsersPage() {
 
         const options = {
           method: 'GET',
-          url: `http://127.0.0.1:8000//api/users/?page=${page}`, // api pages
+          url: `http://127.0.0.1:8000//api/users/?page=${page}`,
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Token ${token}`
@@ -107,32 +110,17 @@ function UsersPage() {
         method: 'DELETE',
         url: `http://127.0.0.1:8000//api/users/${deleteDialog.userId}/`,
         headers: {
-          'Content-Type': 'multipart/form-data',
           'Authorization': `Token ${token}`
         }
       };
 
-      console.log('Tentando deletar usuário com as seguintes opções:', options);
-      
-      const response = await axios.request(options);
-      console.log('Resposta da API:', response);
-      
-      // Atualiza a lista de usuários removendo o usuário excluído
+      await axios.request(options);
       setUsers(users.filter(user => user.id !== deleteDialog.userId));
       setDeleteDialog({ open: false, userId: null, userName: '' });
     } catch (error) {
-      console.error('Erro detalhado ao deletar usuário:', {
-        mensagem: error.message,
-        resposta: error.response?.data,
-        status: error.response?.status,
-        headers: error.response?.headers
-      });
-      setError(`Erro ao deletar usuário: ${error.response?.data?.message || error.message}`);
+      console.error('Erro ao deletar usuário:', error);
+      setError(error.response?.data?.message || 'Erro ao deletar usuário');
     }
-  };
-
-  const handleDeleteCancel = () => {
-    setDeleteDialog({ open: false, userId: null, userName: '' });
   };
 
   const handleNewUserClick = () => {
@@ -144,20 +132,11 @@ function UsersPage() {
     });
   };
 
-  const handleNewUserClose = () => {
-    setNewUserDialog({
-      open: false,
-      name: '',
-      email: '',
-      password: ''
-    });
-  };
-
   const handleNewUserSubmit = async () => {
     try {
       const token = localStorage.getItem('token');
       const formData = new FormData();
-      formData.append('username', newUserDialog.name.toLowerCase().replace(/\s+/g, '')); // Converte nome em username
+      formData.append('username', newUserDialog.name.toLowerCase().replace(/\s+/g, ''));
       formData.append('email', newUserDialog.email);
       formData.append('password', newUserDialog.password);
       formData.append('name', newUserDialog.name);
@@ -173,10 +152,63 @@ function UsersPage() {
 
       const response = await axios.request(options);
       setUsers([...users, response.data]);
-      handleNewUserClose();
+      setNewUserDialog({ open: false, name: '', email: '', password: '' });
     } catch (error) {
       console.error('Erro ao criar usuário:', error);
-      setError(error.response?.data?.message || 'Erro ao criar usuário. Por favor, tente novamente.');
+      setError(error.response?.data?.message || 'Erro ao criar usuário');
+    }
+  };
+
+  const handleEditClick = (user) => {
+    setEditUserDialog({
+      open: true,
+      userId: user.id,
+      name: user.name || user.username,
+      email: user.email,
+      password: ''
+    });
+  };
+
+  const handleEditSubmit = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Criando um objeto com os dados a serem atualizados
+      const updateData = {};
+      
+      // Só adiciona os campos que foram modificados
+      if (editUserDialog.name) {
+        updateData.username = editUserDialog.name.toLowerCase().replace(/\s+/g, '');
+      }
+      if (editUserDialog.email) updateData.email = editUserDialog.email;
+      if (editUserDialog.password) updateData.password = editUserDialog.password;
+
+      console.log('Dados do diálogo:', editUserDialog);
+      console.log('Dados a serem enviados:', updateData);
+
+      const options = {
+        method: 'PATCH',
+        url: `http://127.0.0.1:8000//api/users/${editUserDialog.userId}/`,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${token}`
+        },
+        data: updateData
+      };
+
+      const response = await axios.request(options);
+      console.log('Resposta da API:', response.data);
+      
+      // Atualiza a lista de usuários com os dados atualizados
+      setUsers(users.map(user => 
+        user.id === editUserDialog.userId ? response.data : user
+      ));
+      
+      setEditUserDialog({ open: false, userId: null, name: '', email: '', password: '' });
+    } catch (error) {
+      console.error('Erro ao atualizar usuário:', error);
+      console.error('Detalhes do erro:', error.response?.data);
+      setError(error.response?.data?.message || 'Erro ao atualizar usuário');
     }
   };
 
@@ -184,7 +216,6 @@ function UsersPage() {
     setPage(value);
   };
 
-  // Função para filtrar usuários
   const filteredUsers = users.filter((user) => {
     const query = searchQuery.toLowerCase().trim();
     if (!query) return true;
@@ -226,7 +257,8 @@ function UsersPage() {
                 p: 3, 
                 background: 'linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%)',
                 borderRadius: '12px',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
+                boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+                width: '1500px'
               }}>
                 <Box sx={{ 
                   display: 'flex', 
@@ -254,12 +286,33 @@ function UsersPage() {
                       placeholder="Buscar por nome ou e-mail"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
+                      sx={{
+                        width: '400px',
+                        '& .MuiOutlinedInput-root': {
+                          '&:hover fieldset': {
+                            borderColor: '#BE3124',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#BE3124',
+                          },
+                        },
+                        '& .MuiInputLabel-root.Mui-focused': {
+                          color: '#BE3124',
+                        },
+                      }}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
-                            <SearchIcon />
+                            <SearchIcon sx={{ 
+                              color: '#BE3124',
+                              fontSize: '1.5rem'
+                            }} />
                           </InputAdornment>
                         ),
+                        sx: {
+                          height: '45px',
+                          fontSize: '1rem'
+                        }
                       }}
                     />
                     
@@ -317,6 +370,14 @@ function UsersPage() {
                           </TableCell>
                           <TableCell align="right">
                             <IconButton 
+                              onClick={() => handleEditClick(user)}
+                              color="primary"
+                              size="small"
+                              sx={{ mr: 1 }}
+                            >
+                              <EditIcon />
+                            </IconButton>
+                            <IconButton 
                               onClick={() => handleDeleteClick(user.id, user.name || user.username)}
                               color="error"
                               size="small"
@@ -344,152 +405,29 @@ function UsersPage() {
         </Box>
       </div>
 
-      {/* Diálogo de Confirmação de Exclusão */}
-      <Dialog
+      <DeleteUserDialog
         open={deleteDialog.open}
-        onClose={handleDeleteCancel}
-      >
-        <DialogTitle>Confirmar Exclusão</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Você tem certeza que deseja excluir o usuário ID {deleteDialog.userId} - {deleteDialog.userName}?
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDeleteCancel} color="primary">
-            Cancelar
-          </Button>
-          <Button onClick={handleDeleteConfirm} color="error" variant="contained">
-            Excluir
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onClose={() => setDeleteDialog({ open: false, userId: null, userName: '' })}
+        onConfirm={handleDeleteConfirm}
+        userId={deleteDialog.userId}
+        userName={deleteDialog.userName}
+      />
 
-      {/* Diálogo de Novo Usuário */}
-      <Dialog
+      <NewUserDialog
         open={newUserDialog.open}
-        onClose={handleNewUserClose}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{
-          sx: {
-            borderRadius: '12px',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-          }
-        }}
-      >
-        <DialogTitle sx={{ 
-          bgcolor: '#f5f5f5',
-          borderBottom: '1px solid #e0e0e0',
-          py: 2,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1
-        }}>
-          <PeopleIcon sx={{ color: '#BE3124' }} />
-          <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#333' }}>
-            Novo Usuário
-          </Typography>
-        </DialogTitle>
-        <DialogContent sx={{ mt: 2 }}>
-          <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            gap: 3,
-            '& .MuiTextField-root': {
-              '& .MuiOutlinedInput-root': {
-                '&:hover fieldset': {
-                  borderColor: '#BE3124',
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: '#BE3124',
-                },
-              },
-              '& .MuiInputLabel-root.Mui-focused': {
-                color: '#BE3124',
-              },
-            },
-          }}>
-            <TextField
-              label="Nome Completo"
-              fullWidth
-              value={newUserDialog.name}
-              onChange={(e) => setNewUserDialog({ ...newUserDialog, name: e.target.value })}
-              placeholder="Digite o nome completo do usuário"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <PeopleIcon sx={{ color: '#BE3124' }} />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <TextField
-              label="Email"
-              fullWidth
-              type="email"
-              value={newUserDialog.email}
-              onChange={(e) => setNewUserDialog({ ...newUserDialog, email: e.target.value })}
-              placeholder="exemplo@email.com"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <EmailIcon sx={{ color: '#BE3124' }} />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <TextField
-              label="Senha"
-              fullWidth
-              type="password"
-              value={newUserDialog.password}
-              onChange={(e) => setNewUserDialog({ ...newUserDialog, password: e.target.value })}
-              placeholder="Digite uma senha segura"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LockIcon sx={{ color: '#BE3124' }} />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ 
-          px: 3, 
-          py: 2, 
-          borderTop: '1px solid #e0e0e0',
-          bgcolor: '#f5f5f5'
-        }}>
-          <Button 
-            onClick={handleNewUserClose} 
-            variant="outlined"
-            sx={{ 
-              borderColor: '#BE3124',
-              color: '#BE3124',
-              '&:hover': {
-                borderColor: '#9C291E',
-                bgcolor: 'rgba(190, 49, 36, 0.04)'
-              }
-            }}
-          >
-            Cancelar
-          </Button>
-          <Button 
-            onClick={handleNewUserSubmit} 
-            variant="contained"
-            sx={{ 
-              bgcolor: '#BE3124',
-              '&:hover': {
-                bgcolor: '#9C291E'
-              }
-            }}
-          >
-            Criar Usuário
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onClose={() => setNewUserDialog({ open: false, name: '', email: '', password: '' })}
+        onSave={handleNewUserSubmit}
+        userData={newUserDialog}
+        setUserData={setNewUserDialog}
+      />
+
+      <EditUserDialog
+        open={editUserDialog.open}
+        onClose={() => setEditUserDialog({ open: false, userId: null, name: '', email: '', password: '' })}
+        onSave={handleEditSubmit}
+        userData={editUserDialog}
+        setUserData={setEditUserDialog}
+      />
     </>
   );
 }

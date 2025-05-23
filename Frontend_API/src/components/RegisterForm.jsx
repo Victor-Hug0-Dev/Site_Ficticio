@@ -57,11 +57,11 @@ function RegisterForm() {
 
       <div className="input-group name-group">
         <label htmlFor="name">
-          <i className="bi bi-person-vcard" style={{ fontSize: '23px' }}></i> Nome Completo:
+          <i className="bi bi-person-vcard" style={{ fontSize: '23px' }}></i> Usuário:
         </label>
         <input
           type="text"
-          placeholder="Digite seu nome completo..."
+          placeholder="Digite o nome de usuário..."
           value={username}
           onChange={(e) => setUserName(e.target.value)}
           required

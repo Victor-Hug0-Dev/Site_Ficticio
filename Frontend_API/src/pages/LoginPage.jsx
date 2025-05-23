@@ -1,20 +1,18 @@
-import { useState } from "react";
-import LoginForm from "../components/LoginForm";
 import { useNavigate } from "react-router-dom";
+import LoginForm from "../components/LoginForm";
+import '../styles/LoginPage.css';
+import '../styles/img.css';
+
 
 function LoginPage() {
-  const [loggedIn, setLoggedIn] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    setLoggedIn(true);
-    navigate("/success");
-  };
-
   return (
-    <div>
-      <h1>Login</h1>
-      {!loggedIn ? <LoginForm onLogin={handleLogin} /> : null}
+    <div className="login-container">
+      <div className="logo-salcomp-white"></div>
+      <div className="separator"></div>
+      <div className="title-login">LOGIN</div>
+      <LoginForm />
     </div>
   );
 }

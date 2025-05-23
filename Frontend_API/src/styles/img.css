@@ -1,0 +1,13 @@
+.logo-salcomp-white {
+  background: url("../assets/salcomp-white.png") no-repeat;
+  margin: 0 auto 25px auto;
+  width: 320px;
+  height: 50px;
+}
+
+.logo-salcomp-redd {
+  background: url("../assets/salcomp-redd.png") no-repeat;
+  margin: 0 auto 25px auto;
+  width: 280px;
+  height: 50px;
+}

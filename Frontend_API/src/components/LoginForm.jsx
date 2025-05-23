@@ -1,36 +1,96 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { Login as LoginIcon } from '@mui/icons-material';
 
-function LoginForm({ onLogin }) {
+function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const handleSubmit = (e) => {
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aqui você pode adicionar a validação ou chamar uma API para autenticação
-    if (email === "teste@teste.com" && password === "12345") {
-      onLogin();
-    } else {
-      alert("Email ou senha incorretos");
+    setError("");
+    setLoading(true);
+
+    try {
+      const result = await login(email, password);
+      if (result.success) {
+        navigate("/dashboard");
+      } else {
+        setError(result.error || "Erro ao fazer login. Verifique suas credenciais.");
+      }
+    } catch (error) {
+      setError("Ocorreu um erro ao fazer login. Tente novamente.");
+      console.error("Erro no login:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
-      <input
-        type="password"
-        placeholder="Senha"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
-      <button type="submit">Login</button>
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      )}
+      
+      <div className="input-group email-group">
+        <label htmlFor="email">
+          <i className="bi bi-person" style={{ fontSize: '23px' }}></i> E-mail:
+        </label>
+        <input
+          type="email"
+          placeholder="Digite seu e-mail..."
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          disabled={loading}
+        />
+      </div>
+
+      <div className="input-group password-group">
+        <label htmlFor="password">
+          <i className="bi bi-lock-fill" style={{ fontSize: '23px' }}></i> Senha:
+        </label>
+        <input
+          type={showPassword ? "text" : "password"}
+          placeholder="Digite sua senha..."
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          disabled={loading}
+        />
+        <i
+          className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"} toggle-password`}
+          style={{ fontSize: '23px' }}
+          onClick={togglePasswordVisibility}
+        ></i>
+      </div>
+
+      <center>
+        <button 
+          type="submit" 
+          className="login-button"
+          disabled={loading}
+        >
+          {loading ? "ENTRANDO..." : "ENTRAR"} <LoginIcon style={{ marginLeft: '8px', verticalAlign: 'middle' }} />
+        </button>
+      </center>
+
+      <div className="links">
+        <a href="#" className="forgot-password">Esqueceu a senha?</a>
+        <a href="/register" className="signup-link">Não tem conta? Cadastre-se</a>
+      </div>
     </form>
   );
 }

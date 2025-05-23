@@ -1,33 +1,120 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { PersonAdd as PersonAddIcon } from '@mui/icons-material';
 
-function RegisterForm({ onRegister }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+function RegisterForm() {
+  const [username, setUserName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
+  const handleRegister = async (e) => {
     e.preventDefault();
-    // Aqui você pode adicionar lógica para registrar o usuário
-    alert("Cadastro realizado com sucesso!");
-    onRegister();
+    setError("");
+    setLoading(true);
+
+    try {
+      const response = await axios.post(
+        'http://127.0.0.1:8000//api/register/', //api de registro
+        {
+          username,
+          email,
+          password
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        }
+      );
+
+      if (response.data) {
+        navigate("/login");
+      }
+    } catch (error) {
+      setError(error.response?.data?.message || "Erro ao registrar usuário");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
-      <input
-        type="password"
-        placeholder="Senha"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
-      <button type="submit">Cadastrar</button>
+    <form onSubmit={handleRegister}>
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      )}
+
+      <div className="input-group name-group">
+        <label htmlFor="name">
+          <i className="bi bi-person-vcard" style={{ fontSize: '23px' }}></i> Usuário:
+        </label>
+        <input
+          type="text"
+          placeholder="Digite o nome de usuário..."
+          value={username}
+          onChange={(e) => setUserName(e.target.value)}
+          required
+          disabled={loading}
+        />
+      </div>
+
+      <div className="input-group email-group">
+        <label htmlFor="email">
+          <i className="bi bi-person" style={{ fontSize: '23px' }}></i> E-mail:
+        </label>
+        <input
+          type="email"
+          placeholder="Digite seu e-mail aqui..."
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          disabled={loading}
+        />
+      </div>
+
+      <div className="input-group password-group">
+        <label htmlFor="password">
+          <i className="bi bi-lock-fill" style={{ fontSize: '23px' }}></i> Senha:
+        </label>
+        <input
+          type={showPassword ? "text" : "password"}
+          placeholder="Digite sua senha..."
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          disabled={loading}
+        />
+        <i
+          className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"} toggle-password`}
+          style={{ fontSize: '23px' }}
+          onClick={togglePasswordVisibility}
+        ></i>
+      </div>
+
+      <center>
+        <button 
+          type="submit" 
+          className="login-button"
+          disabled={loading}
+        >
+          {loading ? "CADASTRANDO..." : "CADASTRAR"} <PersonAddIcon style={{ marginLeft: '8px', verticalAlign: 'middle' }} />
+        </button>
+      </center>
+
+      <div className="links">
+        <a href="/login" className="signup-link">Fazer Login</a>
+      </div>
     </form>
   );
 }

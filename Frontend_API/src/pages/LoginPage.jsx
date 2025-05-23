@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import LoginForm from "../components/LoginForm";
+import LoginForm from "../components/auth/LoginForm";
 import '../styles/LoginPage.css';
 import '../styles/img.css';
 
@@ -9,7 +9,7 @@ function LoginPage() {
 
   return (
     <div className="login-container">
-      <div className="logo-salcomp-white"></div>
+      <center><div className="logo-salcomp-reddd"></div></center>
       <div className="separator"></div>
       <div className="title-login">LOGIN</div>
       <LoginForm />

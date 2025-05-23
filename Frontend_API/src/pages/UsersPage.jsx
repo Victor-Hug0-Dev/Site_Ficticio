@@ -258,7 +258,8 @@ function UsersPage() {
                 background: 'linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%)',
                 borderRadius: '12px',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
-                width: '1500px'
+                width: '1900px',
+                height: '800px'
               }}>
                 <Box sx={{ 
                   display: 'flex', 

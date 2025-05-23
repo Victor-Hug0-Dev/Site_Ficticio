@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import { Login as LoginIcon } from '@mui/icons-material';
 
 function LoginForm() {
@@ -88,8 +88,8 @@ function LoginForm() {
       </center>
 
       <div className="links">
-        <a href="#" className="forgot-password">Esqueceu a senha?</a>
-        <a href="/register" className="signup-link">Não tem conta? Cadastre-se</a>
+        <Link to="/forgot-password" className="forgot-password">Esqueceu a senha?</Link>
+        <Link to="/register" className="signup-link">Não tem conta? Cadastre-se</Link>
       </div>
     </form>
   );

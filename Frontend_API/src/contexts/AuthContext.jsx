@@ -15,12 +15,13 @@ export function AuthProvider({ children }) {
       fetchUserProfile(token);
     } else {
       setLoading(false);
+      setIsAuthenticated(false);
     }
   }, []);
 
   const fetchUserProfile = async (token) => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000//api/profile/", { //api de perfil logado
+      const response = await axios.get("http://127.0.0.1:8000/api/profile/", {
         headers: {
           'Authorization': `Token ${token}`,
           'Content-Type': 'application/json',
@@ -42,7 +43,7 @@ export function AuthProvider({ children }) {
     try {
       const options = {
         method: 'POST',
-        url: 'http://127.0.0.1:8000//auth/login/', //api de login
+        url: 'http://127.0.0.1:8000/auth/login/',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -83,7 +84,7 @@ export function AuthProvider({ children }) {
 
       const options = {
         method: 'POST',
-        url: 'http://127.0.0.1:8000//auth/logout/', //api de logout
+        url: 'http://127.0.0.1:8000/auth/logout/',
         headers: {
           Accept: 'application/json',
           Authorization: `Token ${token}`
@@ -91,27 +92,21 @@ export function AuthProvider({ children }) {
       };
 
       await axios.request(options);
-      
-      // Limpa os dados do usuário
-      localStorage.removeItem('token');
-      setUser(null);
-      setError(null);
-      setLoading(false);
-      setIsAuthenticated(false);
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
-      // Mesmo com erro, limpa os dados locais
+    } finally {
+      // Sempre limpa os dados locais, mesmo se houver erro
       localStorage.removeItem('token');
       setUser(null);
       setError(null);
-      setLoading(false);
       setIsAuthenticated(false);
+      setLoading(false);
     }
   };
 
   const register = async (username, email, password) => {
     try {
-      await axios.post('http://127.0.0.1:8000//api/register/', { //api de registro
+      await axios.post('http://127.0.0.1:8000/api/register/', {
         username,
         email,
         password
@@ -133,7 +128,8 @@ export function AuthProvider({ children }) {
       login, 
       logout, 
       register,
-      isAuthenticated: !!user 
+      isAuthenticated,
+      error
     }}>
       {children}
     </AuthContext.Provider>

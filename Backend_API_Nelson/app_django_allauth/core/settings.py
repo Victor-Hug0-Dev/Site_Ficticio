@@ -162,15 +162,17 @@ SOCIALACCOUNT_PROVIDERS = {
         'APP': {
             'client_id': GOOGLE_CLIENT_ID,
             'secret': GOOGLE_SECRET,
+            'redirect_uri': 'http://127.0.0.1:8000/auth/google/callback/',
             'key': ''
         }
     },
 }
 
-# Usando o adapter personalizado
-SOCIALACCOUNT_ADAPTER = 'auth_user.adapters.CustomSocialAccountAdapter'
-ACCOUNT_ADAPTER = 'auth_user.adapters.CustomSocialAccountAdapter'
+# Usando o adapter padrão
+SOCIALACCOUNT_ADAPTER = 'allauth.socialaccount.adapter.DefaultSocialAccountAdapter'
 SOCIALACCOUNT_AUTO_SIGNUP = True
+DOMAIN = "127.0.0.1:8000"
+
 
 #Configurações de Email (Exemplo com console backend para desenvolvimento)
 # Para produção, configure um backend de email real (SMTP, SendGrid, etc.)

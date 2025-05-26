@@ -105,18 +105,34 @@ function UsersPage() {
   const handleDeleteConfirm = async () => {
     try {
       const token = localStorage.getItem('token');
+      const form = new FormData();
       
       const options = {
         method: 'DELETE',
         url: `http://127.0.0.1:8000//api/users/${deleteDialog.userId}/`,
         headers: {
+          'Content-Type': 'multipart/form-data',
           'Authorization': `Token ${token}`
-        }
+        },
+        data: form
       };
 
       await axios.request(options);
-      setUsers(users.filter(user => user.id !== deleteDialog.userId));
-      setDeleteDialog({ open: false, userId: null, userName: '' });
+      console.log('Usuário deletado com sucesso');
+      
+      // Atualiza a lista de usuários
+      setUsers(prevUsers => 
+        prevUsers.filter(user => user.id !== deleteDialog.userId)
+      );
+      
+      // Fecha o diálogo
+      setDeleteDialog({
+        open: false,
+        userId: null,
+        userName: ''
+      });
+      
+      setError(null);
     } catch (error) {
       console.error('Erro ao deletar usuário:', error);
       setError(error.response?.data?.message || 'Erro ao deletar usuário');

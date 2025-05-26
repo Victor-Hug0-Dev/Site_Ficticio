@@ -9,6 +9,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
 import UsersPage from "./pages/UsersPage";
+import DevicesPage from "./pages/DevicesPage";
 import ForgotPassword from './pages/auth/ForgotPassword';
 
 function App() {
@@ -36,6 +37,14 @@ function App() {
             element={
               <PrivateRoute>
                 <UsersPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/dispositivos"
+            element={
+              <PrivateRoute>
+                <DevicesPage />
               </PrivateRoute>
             }
           />

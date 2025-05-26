@@ -31,13 +31,11 @@ class AuthLoginSerializer(serializers.Serializer):
         
         user = authenticate(self.context['request'].method, email=email, password=password)
         
-        print(user)
         if not user:
             raise serializers.ValidationError("Incorrect Credentials")
             
         if not user.is_active:
-            raise serializers.ValidationError("User is not active")       
-       
+            raise serializers.ValidationError("User is not active") 
         return user
     
 class ProfileSerializer(AuthSerializer):    

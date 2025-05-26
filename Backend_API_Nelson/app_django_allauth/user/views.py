@@ -32,10 +32,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def change_password(self, request, pk=None):
-        """
-        Endpoint personalizado para alteração de senha.
-        pk: ID do usuário
-        """
+     
         user = self.get_object()
         if 'password' not in request.data:
             return Response(

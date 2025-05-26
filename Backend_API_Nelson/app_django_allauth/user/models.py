@@ -56,17 +56,12 @@ class UserManager(BaseUserManager):
 # ==============================================
 
 class User(AbstractBaseUser, PermissionsMixin):
-    """
-    Modelo de usuário personalizado que substitui o padrão do Django.
-    Utiliza email como campo principal de autenticação.
-    """
 
     # Campos do modelo
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
     is_active = models.BooleanField(default=True)  # Define se o usuário está ativo
     is_staff = models.BooleanField(default=False)  # Define se é parte da equipe/admin
-    date_joined = models.DateTimeField(default=timezone.now)
 
     # Gerenciador personalizado
     objects = UserManager()
@@ -76,14 +71,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['username']  # Campos obrigatórios além do USERNAME_FIELD
 
     def __str__(self):
-        """
-        Representação em string do usuário (usada no admin e shell)
-        
-        Returns:
-            str: Email do usuário
-        """
         return self.email
-
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)  # Vinculo 1:1

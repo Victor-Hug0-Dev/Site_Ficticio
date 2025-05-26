@@ -58,8 +58,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    #'allauth.account.middleware.AccountMiddleware',
-
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -138,21 +136,41 @@ REST_AUTH = {
 }
 
 # Configurações do allauth
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_VERIFICATION = 'none'  # Mudando para 'none' para facilitar o teste
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
 
+# Configurações do social account
+try:
+    from .settings_local import *
+except ImportError:
+    pass
 
-# settings.py
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'APP': {
+            'client_id': GOOGLE_CLIENT_ID,
+            'secret': GOOGLE_SECRET,
+            'key': ''
+        }
+    },
+}
 
-
-# Opcional: Para preencher automaticamente campos do usuário a partir de dados sociais
-SOCIALACCOUNT_ADAPTER = 'allauth.socialaccount.adapter.DefaultSocialAccountAdapter'
-ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
-SOCIALACCOUNT_AUTO_SIGNUP = True # Tenta cadastrar o usuário automaticamente se ele não existir
-
+# Usando o adapter personalizado
+SOCIALACCOUNT_ADAPTER = 'auth_user.adapters.CustomSocialAccountAdapter'
+ACCOUNT_ADAPTER = 'auth_user.adapters.CustomSocialAccountAdapter'
+SOCIALACCOUNT_AUTO_SIGNUP = True
 
 #Configurações de Email (Exemplo com console backend para desenvolvimento)
 # Para produção, configure um backend de email real (SMTP, SendGrid, etc.)

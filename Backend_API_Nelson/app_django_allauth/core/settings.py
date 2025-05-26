@@ -1,6 +1,7 @@
 from pathlib import Path
 import os   
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -124,7 +125,7 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-SITE_ID = 1
+SITE_ID = 2
 
 # Configurações do dj-rest-auth
 REST_AUTH = {
@@ -136,11 +137,11 @@ REST_AUTH = {
 }
 
 # Configurações do allauth
-ACCOUNT_EMAIL_VERIFICATION = 'none'  # Mudando para 'none' para facilitar o teste
+ACCOUNT_EMAIL_VERIFICATION = 'optional'  # Mudando para 'none' para facilitar o teste
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
 
@@ -162,7 +163,6 @@ SOCIALACCOUNT_PROVIDERS = {
         'APP': {
             'client_id': GOOGLE_CLIENT_ID,
             'secret': GOOGLE_SECRET,
-            'redirect_uri': 'http://127.0.0.1:8000/auth/google/callback/',
             'key': ''
         }
     },

@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, User
 from django.utils import timezone
 
-
 # ==============================================
 # GERENCIADOR DE USUÁRIOS PERSONALIZADO
 # ==============================================
@@ -63,7 +62,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)  # Define se o usuário está ativo
     is_staff = models.BooleanField(default=False)  # Define se é parte da equipe/admin
     date_joined = models.DateTimeField(default=timezone.now)
-
     # Gerenciador personalizado
     objects = UserManager()
 

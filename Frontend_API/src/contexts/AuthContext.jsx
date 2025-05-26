@@ -9,31 +9,89 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  // Configuração do axios para interceptar requisições
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      fetchUserProfile(token);
+    const requestInterceptor = axios.interceptors.request.use(
+      (config) => {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        console.log('Requisição sendo enviada:', config);
+        return config;
+      },
+      (error) => {
+        console.error('Erro no interceptor de requisição:', error);
+        return Promise.reject(error);
+      }
+    );
+
+    const responseInterceptor = axios.interceptors.response.use(
+      (response) => {
+        console.log('Resposta recebida:', response);
+        return response;
+      },
+      async (error) => {
+        console.error('Erro na resposta:', error.response || error);
+        const originalRequest = error.config;
+        
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          console.log('Tentando renovar o token...');
+          originalRequest._retry = true;
+          try {
+            const refreshToken = localStorage.getItem('refresh_token');
+            console.log('Refresh token:', refreshToken);
+            
+            const response = await axios.post('http://192.168.0.9:8000/auth/token/refresh/', {
+              refresh: refreshToken
+            });
+            
+            console.log('Novo token recebido:', response.data);
+            const { access } = response.data;
+            localStorage.setItem('access_token', access);
+            originalRequest.headers.Authorization = `Bearer ${access}`;
+            return axios(originalRequest);
+          } catch (refreshError) {
+            console.error('Erro ao renovar token:', refreshError.response || refreshError);
+            logout();
+            return Promise.reject(refreshError);
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.request.eject(requestInterceptor);
+      axios.interceptors.response.eject(responseInterceptor);
+    };
+  }, []);
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem('access_token');
+    console.log('Token de acesso encontrado:', accessToken);
+    if (accessToken) {
+      fetchUserProfile();
     } else {
       setLoading(false);
       setIsAuthenticated(false);
     }
   }, []);
 
-  const fetchUserProfile = async (token) => {
+  const fetchUserProfile = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/profile/", {
-        headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json',
-        }
-      });
+      console.log('Buscando perfil do usuário...');
+      const response = await axios.get("http://192.168.0.9:8000/auth/profile/");
+      console.log('Perfil recebido:', response.data);
       setUser(response.data);
       setIsAuthenticated(true);
     } catch (error) {
-      console.error("Erro ao buscar perfil:", error);
-      localStorage.removeItem('token');
-      setUser(null);
-      setIsAuthenticated(false);
+      console.error("Erro detalhado ao buscar perfil:", {
+        status: error.response?.status,
+        data: error.response?.data,
+        headers: error.response?.headers
+      });
+      logout();
     } finally {
       setLoading(false);
     }
@@ -41,33 +99,53 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const options = {
-        method: 'POST',
-        url: 'http://127.0.0.1:8000/auth/login/',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        data: {
-          username: email,
-          password: password
-        }
-      };
+      console.log('Iniciando login...');
+      const formData = new FormData();
+      formData.append('email', email);
+      formData.append('password', password);
 
-      const response = await axios.request(options);
-      const { token } = response.data;
+      console.log('Dados do formulário:', {
+        email,
+        password: '***'
+      });
+
+      const response = await axios.post('http://192.168.0.9:8000/auth/login/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+
+      console.log('Resposta completa do servidor:', response);
+      console.log('Dados da resposta:', response.data);
+
+      // Verificando a estrutura da resposta
+      const responseData = response.data;
       
-      if (token) {
-        localStorage.setItem('token', token);
-        await fetchUserProfile(token);
-        return { success: true };
-      } else {
-        return {
-          success: false,
-          error: "Token não recebido do servidor"
-        };
+      // Acessando os tokens dentro do objeto tokens
+      if (responseData.tokens) {
+        const { access, refresh } = responseData.tokens;
+        
+        if (access) {
+          localStorage.setItem('access_token', access);
+          if (refresh) {
+            localStorage.setItem('refresh_token', refresh);
+          }
+          await fetchUserProfile();
+          return { success: true };
+        }
       }
+
+      console.error('Estrutura da resposta não reconhecida:', responseData);
+      return {
+        success: false,
+        error: "Formato de resposta não reconhecido pelo servidor"
+      };
     } catch (error) {
-      console.error("Erro no login:", error);
+      console.error("Erro detalhado no login:", {
+        status: error.response?.status,
+        data: error.response?.data,
+        headers: error.response?.headers
+      });
       return {
         success: false,
         error: error.response?.data?.message || "Erro ao fazer login"
@@ -77,43 +155,47 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Token não encontrado');
+      console.log('Iniciando logout...');
+      const refreshToken = localStorage.getItem('refresh_token');
+      if (refreshToken) {
+        await axios.post('http://192.168.0.9:8000/auth/logout/', {
+          refresh: refreshToken
+        });
+        console.log('Logout realizado com sucesso no servidor');
       }
-
-      const options = {
-        method: 'POST',
-        url: 'http://127.0.0.1:8000/auth/logout/',
-        headers: {
-          Accept: 'application/json',
-          Authorization: `Token ${token}`
-        }
-      };
-
-      await axios.request(options);
     } catch (error) {
-      console.error('Erro ao fazer logout:', error);
+      console.error('Erro detalhado no logout:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        headers: error.response?.headers
+      });
     } finally {
-      // Sempre limpa os dados locais, mesmo se houver erro
-      localStorage.removeItem('token');
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
       setUser(null);
       setError(null);
       setIsAuthenticated(false);
       setLoading(false);
+      console.log('Dados locais limpos após logout');
     }
   };
 
   const register = async (username, email, password) => {
     try {
-      await axios.post('http://127.0.0.1:8000/api/register/', {
+      console.log('Iniciando registro...');
+      const response = await axios.post('http://192.168.0.9:8000/auth/register/', {
         username,
         email,
         password
       });
+      console.log('Resposta do registro:', response.data);
       return { success: true };
     } catch (error) {
-      console.error("Erro no registro:", error);
+      console.error("Erro detalhado no registro:", {
+        status: error.response?.status,
+        data: error.response?.data,
+        headers: error.response?.headers
+      });
       return {
         success: false,
         error: error.response?.data?.message || "Erro ao registrar usuário"

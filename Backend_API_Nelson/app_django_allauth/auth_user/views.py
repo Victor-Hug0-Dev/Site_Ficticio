@@ -10,28 +10,6 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
 from dj_rest_auth.registration.views import SocialLoginView
 
-'''class GoogleCallbackView(OAuth2CallbackView, APIView):
-    adapter_class = GoogleOAuth2Adapter
-    permission_classes = [AllowAny]
-
-    def dispatch(self, request, *args, **kwargs):
-        try:
-            response = super().dispatch(request, *args, **kwargs)
-            
-            # Se o login foi bem sucedido, retorna o token
-            if request.user.is_authenticated:
-                token, created = Token.objects.get_or_create(user=request.user)
-                return Response({
-                    'token': token.key,
-                    'user_id': request.user.id,
-                    'email': request.user.email,
-                    'username': request.user.username
-                })
-            
-            return response
-        except Exception as e:
-            return render_authentication_error(request, 'google', exception=e)'''
-
 class GoogleLogin(SocialLoginView): # Herdando de SocialLoginView
     adapter_class = GoogleOAuth2Adapter
     # Não é necessário especificar callback_url aqui se estiver usando a padrão do allauth

@@ -6,3 +6,5 @@ djangorestframework_simplejwt==5.5.0
 Pygments==2.19.1
 PyJWT==2.9.0
 sqlparse==0.5.3
+pytest==7.4.2
+pytest-django==4.5.2

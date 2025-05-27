@@ -4,7 +4,7 @@
 - . [About the project](#about-the-project)
 - . [How to install](#how-to-install)
 - . [How to run](#how-to-run)
-- . [What this site can do](#what-this-side-can-do)
+- . [What this site can do](#what-this-site-can-do)
 - . [Links](#links)
 - . [License](#license)
 

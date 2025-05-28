@@ -1,5 +1,5 @@
 from django.urls import path
-from authentication import views
+from auth_jwt import views
 from rest_framework_simplejwt.views import TokenRefreshView
 
 app_name = "authtest"

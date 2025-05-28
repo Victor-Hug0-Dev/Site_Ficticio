@@ -22,3 +22,8 @@ class UserDeleteViewSet(generics.DestroyAPIView):
     permission_classes = (AllowAny,)
     queryset = User.objects.all()
     serializer_class = serializers.UserDeleteSerializer
+
+class UserUpdateViewSet(generics.UpdateAPIView):
+    permission_classes = (AllowAny,)
+    queryset = User.objects.all()
+    serializer_class = serializers.UserUpdateSerializer

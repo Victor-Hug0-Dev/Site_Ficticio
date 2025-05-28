@@ -169,7 +169,7 @@ function UsersPage() {
       console.log('Dados do novo usuário:', userData);
 
       const response = await axios.post(
-        'http://192.168.0.9:8000/auth/register/',
+        'http://192.168.0.9:8000/user/register/',
         userData,
         {
           headers: {

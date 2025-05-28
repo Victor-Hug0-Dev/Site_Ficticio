@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  frontend:
+    image: node:20
+    container_name: react-frontend
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - /app/node_modules
+      - ./src/assets:/app/src/assets  # Mapeamento crítico
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
+    ports:
+      - "5173:5173"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - VITE_HOST=0.0.0.0
+    networks:
+      - dev-network
+
+  db:
+    image: postgres:16
+    container_name: postgres-db
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=devdb
+      - POSTGRES_USER=devuser
+      - POSTGRES_PASSWORD=devpass
+    ports:
+      - "5431:5432"
+    networks:
+      - dev-network
+
+volumes:
+  postgres_data:
+
+networks:
+  dev-network:
+    driver: bridge

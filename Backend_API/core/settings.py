@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-%^+6wnyq%-*wv@_#mlj**9n26oafnh+_@&b8lnj6iukvgn)0b!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["192.168.0.9", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["192.168.0.9", "localhost", "127.0.0.1","192.168.0.11","0.0.0.0"]
 
 
 # Application definition
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
 
     #Django rest framework
     'rest_framework',    
@@ -53,7 +54,17 @@ INSTALLED_APPS = [
 
     #API    
     'user',
+    'inventory',
     'auth_jwt',
+    'auth_allauth',
+
+    # Allauth for social authentication
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
 ]
 
 SIMPLE_JWT = {
@@ -116,16 +127,64 @@ TEMPLATES = [
 AUTHENTICATION_BACKENDS = [   
     'user.backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',  
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+SITE_ID = 2
 
 AUTH_USER_MODEL = 'user.User'
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
 
+REST_AUTH = {
+    'USE_JWT': False,
+    'TOKEN_MODEL': 'rest_framework.authtoken.models.Token',
+    'SESSION_LOGIN': False, # Desabilita login por sessão na API,
+    'USER_DETAILS_SERIALIZER': 'user.serializers.UserSerializer', # **IMPORTANTE:** Substitua pelo seu serializer de detalhes do usuário
+    'REGISTER_SERIALIZER': 'dj_rest_auth.registration.serializers.RegisterSerializer', # Serializer padrão para registro
+}
+
+# Configurações do allauth
+ACCOUNT_EMAIL_VERIFICATION = 'optional'  # Mudando para 'none' para facilitar o teste
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
+
+
+# Configurações do social account
+try:
+    from .settings_local import *
+except ImportError:
+    pass
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'APP': {
+            'client_id': GOOGLE_CLIENT_ID,
+            'secret': GOOGLE_SECRET,
+            'key': ''
+        }
+    },
+}
+
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+
+# Usando o adapter padrão
+SOCIALACCOUNT_ADAPTER = 'allauth.socialaccount.adapter.DefaultSocialAccountAdapter'
+SOCIALACCOUNT_AUTO_SIGNUP = True
+DOMAIN = "127.0.0.1:8000"
 
 DATABASES = {
     'default': {
@@ -148,11 +207,15 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        #'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],   
+    'EXCEPTION_HANDLER': 'core.exceptions.custom_exception_handler',
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
 
 }
 

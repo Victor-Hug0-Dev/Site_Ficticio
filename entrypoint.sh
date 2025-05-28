@@ -8,7 +8,12 @@ done
 
 echo "Banco de dados esta pronto! Rodando migracoes..."
 python manage.py makemigrations
+python manage.py migrate auth
+python manage.py migrate sites
+python manage.py migrate user
+python manage.py migrate socialaccount
 python manage.py migrate
+
 
 
 python manage.py runserver 0.0.0.0:8000

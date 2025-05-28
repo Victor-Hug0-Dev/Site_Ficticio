@@ -2,7 +2,7 @@
 
 function SuccessPage() {
   return (
-    <div>
+    <div className="box-aprovado">
       <h1>Login aprovado!</h1>
       <p>Bem-vindo à plataforma!</p>
     </div>

@@ -39,5 +39,8 @@ class UserDeleteSerializer(ModelSerializer):
         model = User
         fields = ('id')
        
-        
+class UserUpdateSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password')        
     

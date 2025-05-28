@@ -12,6 +12,7 @@ body {
   display: flex;
   margin-top: 64px; /* para não sobrepor a AppBar */
 }
+.tete{color:#000}
 
 .menu-posição{
     margin-left: 300px;

@@ -1,5 +1,8 @@
+import { useState } from "react";
+import RegisterForm from "../components/auth/RegisterForm";
 import { useNavigate } from "react-router-dom";
-import RegisterForm from "../components/RegisterForm";
+import '../styles/LoginPage.css';
+
 
 function RegisterPage() {
   const navigate = useNavigate();
@@ -9,10 +12,13 @@ function RegisterPage() {
   };
 
   return (
-    <div>
-      <h1>Cadastro</h1>
-      <RegisterForm onRegister={handleRegister} />
-    </div>
+
+<div className="login-container">
+<div className="logo-salcomp-reddd"></div>
+<div className="separator"></div>
+<div className="title-login">CADASTRO</div>
+<RegisterForm onRegister={handleRegister} />
+</div>
   );
 }
 

@@ -64,29 +64,32 @@ function UsersPage() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          setError('Usuário não autenticado');
-          setLoading(false);
-          return;
-        }
+        setLoading(true);
+        setError(null);
 
         const options = {
           method: 'GET',
-          url: `http://127.0.0.1:8000//api/users/?page=${page}`,
+          url: 'http://192.168.0.11:8000/user/listall/',
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Token ${token}`
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+            'Content-Type': 'application/json'
           }
         };
 
         const response = await axios.request(options);
-        setUsers(response.data.results || response.data);
-        setTotalPages(Math.ceil((response.data.count || response.data.length) / 5));
-        setLoading(false);
+        console.log('Resposta da API:', response.data);
+        
+        if (Array.isArray(response.data)) {
+          setUsers(response.data);
+          setTotalPages(Math.ceil(response.data.length / 10));
+        } else {
+          setUsers([]);
+          setTotalPages(1);
+        }
       } catch (err) {
         console.error('Erro ao carregar usuários:', err);
-        setError(err.response?.data?.message || 'Erro ao carregar usuários');
+        setError(err.response?.data?.detail || err.message || 'Erro ao carregar usuários');
+      } finally {
         setLoading(false);
       }
     };
@@ -104,13 +107,12 @@ function UsersPage() {
 
   const handleDeleteConfirm = async () => {
     try {
-      const token = localStorage.getItem('token');
-      
       const options = {
         method: 'DELETE',
-        url: `http://127.0.0.1:8000//api/users/${deleteDialog.userId}/`,
+        url: `http://192.168.0.11:8000/user/delete/${deleteDialog.userId}/`,
         headers: {
-          'Authorization': `Token ${token}`
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          'Content-Type': 'application/json'
         }
       };
 
@@ -119,7 +121,7 @@ function UsersPage() {
       setDeleteDialog({ open: false, userId: null, userName: '' });
     } catch (error) {
       console.error('Erro ao deletar usuário:', error);
-      setError(error.response?.data?.message || 'Erro ao deletar usuário');
+      setError(error.response?.data?.detail || error.message || 'Erro ao deletar usuário');
     }
   };
 
@@ -134,7 +136,6 @@ function UsersPage() {
 
   const handleNewUserSubmit = async () => {
     try {
-      const token = localStorage.getItem('token');
       const formData = new FormData();
       formData.append('username', newUserDialog.name.toLowerCase().replace(/\s+/g, ''));
       formData.append('email', newUserDialog.email);
@@ -143,19 +144,19 @@ function UsersPage() {
 
       const options = {
         method: 'POST',
-        url: 'http://127.0.0.1:8000//api/users/',
+        url: 'http://192.168.0.11:8000/user/create/',
         headers: {
-          'Authorization': `Token ${token}`
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
         },
         data: formData
       };
 
       const response = await axios.request(options);
-      setUsers([...users, response.data]);
+      setUsers(prevUsers => [...prevUsers, response.data]);
       setNewUserDialog({ open: false, name: '', email: '', password: '' });
     } catch (error) {
       console.error('Erro ao criar usuário:', error);
-      setError(error.response?.data?.message || 'Erro ao criar usuário');
+      setError(error.response?.data?.detail || error.message || 'Erro ao criar usuário');
     }
   };
 
@@ -171,35 +172,25 @@ function UsersPage() {
 
   const handleEditSubmit = async () => {
     try {
-      const token = localStorage.getItem('token');
-      
-      // Criando um objeto com os dados a serem atualizados
       const updateData = {};
-      
-      // Só adiciona os campos que foram modificados
       if (editUserDialog.name) {
         updateData.username = editUserDialog.name.toLowerCase().replace(/\s+/g, '');
+        updateData.name = editUserDialog.name;
       }
       if (editUserDialog.email) updateData.email = editUserDialog.email;
       if (editUserDialog.password) updateData.password = editUserDialog.password;
 
-      console.log('Dados do diálogo:', editUserDialog);
-      console.log('Dados a serem enviados:', updateData);
-
       const options = {
         method: 'PATCH',
-        url: `http://127.0.0.1:8000//api/users/${editUserDialog.userId}/`,
+        url: `http://192.168.0.11:8000/user/update/${editUserDialog.userId}/`,
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Token ${token}`
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          'Content-Type': 'application/json'
         },
         data: updateData
       };
 
       const response = await axios.request(options);
-      console.log('Resposta da API:', response.data);
-      
-      // Atualiza a lista de usuários com os dados atualizados
       setUsers(users.map(user => 
         user.id === editUserDialog.userId ? response.data : user
       ));
@@ -207,8 +198,7 @@ function UsersPage() {
       setEditUserDialog({ open: false, userId: null, name: '', email: '', password: '' });
     } catch (error) {
       console.error('Erro ao atualizar usuário:', error);
-      console.error('Detalhes do erro:', error.response?.data);
-      setError(error.response?.data?.message || 'Erro ao atualizar usuário');
+      setError(error.response?.data?.detail || error.message || 'Erro ao atualizar usuário');
     }
   };
 

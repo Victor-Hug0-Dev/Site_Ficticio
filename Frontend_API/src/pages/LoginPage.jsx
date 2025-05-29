@@ -3,7 +3,6 @@ import LoginForm from "../components/auth/LoginForm";
 import '../styles/LoginPage.css';
 import '../styles/img.css';
 
-
 function LoginPage() {
   const navigate = useNavigate();
 

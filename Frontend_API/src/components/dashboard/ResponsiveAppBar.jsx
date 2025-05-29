@@ -12,6 +12,7 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import { useAuth } from '../../contexts/AuthContext';
+import { useGoogleAuth } from '../../contexts/GoogleAuthContext';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 
@@ -63,8 +64,12 @@ const settings = ['Meu Perfil', 'Logout'];
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
-  const { user, logout } = useAuth();
+  const { user: jwtUser, logout } = useAuth();
+  const { user: googleUser, logoutGoogle } = useGoogleAuth();
   const navigate = useNavigate();
+
+  // Usa o usuário do Google se disponível, senão usa o do JWT
+  const user = googleUser || jwtUser;
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -84,7 +89,11 @@ function ResponsiveAppBar() {
 
   const handleLogout = async () => {
     try {
-      await logout();
+      if (googleUser) {
+        await logoutGoogle();
+      } else {
+        await logout();
+      }
       handleCloseUserMenu();
       navigate('/login');
     } catch (error) {
@@ -93,7 +102,7 @@ function ResponsiveAppBar() {
       handleCloseUserMenu();
       navigate('/login');
     }
-};
+  };
 
   return (
     <StyledAppBar position="fixed">
@@ -169,15 +178,15 @@ function ResponsiveAppBar() {
           {/* Área do Usuário */}
           <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
             <UserInfo>
-              <UserName>Olá, {user?.username || 'Usuário'}</UserName>
+              <UserName>Olá, {user?.username || user?.name || 'Usuário'}</UserName>
               <UserStatus>Bem vindo(a)!</UserStatus>
             </UserInfo>
 
             <Tooltip title="Configurações do Perfil">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar 
-                  alt={user?.username || 'U'} 
-                  src="/static/images/avatar/2.jpg"
+                  alt={user?.username || user?.name || 'U'} 
+                  src={user?.picture || "/static/images/avatar/2.jpg"}
                   sx={{ 
                     width: 40, 
                     height: 40,

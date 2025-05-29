@@ -187,3 +187,41 @@ body {
         align-items: center;
     }
 }
+
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+    color: #666;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #ddd;
+}
+
+.divider span {
+    padding: 0 10px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.google-login-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.google-login-container > div {
+    width: 100% !important;
+    max-width: 300px !important;
+}
+
+.google-login-container iframe {
+    width: 100% !important;
+    max-width: 300px !important;
+    margin: 0 auto !important;
+}

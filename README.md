@@ -1,6 +1,6 @@
 
      
-## Summarya
+## Summary
 - . [About the project](#about-the-project)
 - . [How to install](#how-to-install)
 - . [How to run](#how-to-run)

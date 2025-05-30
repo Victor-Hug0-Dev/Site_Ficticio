@@ -1,29 +1,61 @@
+version: "3.8"
+
 services:
   backend:
-    build: .
-    command: cd /Backend_API && python manage.py runserver 0.0.0.0:8000
-    volumes:
-       - ./Backend_API:/app/Backend_API
+    build: ./shopflow-backend
+    image: django-image
+    container_name: backend-api
+    restart: unless-stopped
+    entrypoint: /app/shopflow-backend/entrypoint.sh
+    command: python manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
-    depends_on:
-      - db    
-    environment:
-      - DB_NAME=postgres
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - DB_HOST=db
-      - DB_PORT=5432
- 
-  db:
+    volumes:
+      - ./shopflow-backend:/app/shopflow-backend
+    env_file:
+      - ./shopflow-backend/.env.development
+    labels:
+      - "io.portainer.accesscontrol.public=true"
+    networks:
+      - app-network
+
+  frontend:
+    image: node:20
+    container_name: react-web
+    working_dir: /app
+    volumes:
+      - ./shopflow-frontend:/app
+      - /app/node_modules
+      - ./shopflow-frontend/src/assets:/app/src/assets
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
+    ports:
+      - "5173:5173"
+    env_file:
+      - ./shopflow-frontend/.env.development
+    labels:
+      - "io.portainer.accesscontrol.public=true"
+    networks:
+      - app-network
+    
+  postgres:
     image: postgres:15
-    restart: always
+    container_name: postgresdb
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=postgres
+    env_file:
+      - ./shopflow-backend/.env.development
+    labels:
+      - "io.portainer.accesscontrol.public=true"
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

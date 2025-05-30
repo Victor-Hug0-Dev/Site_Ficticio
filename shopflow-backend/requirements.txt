@@ -13,4 +13,4 @@ djangorestframework_simplejwt==5.5.0
 Pygments==2.19.1
 PyJWT==2.9.0
 sqlparse==0.5.3
-google-auth requests
+kafka-python>=2.0

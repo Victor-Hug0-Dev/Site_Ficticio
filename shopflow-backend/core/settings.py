@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 # Caminho base e .env
 BASE_DIR = Path(__file__).resolve().parent.parent
 ENV_PATH = BASE_DIR / '.env'
+
+dotenv_path = Path(__file__).resolve().parent.parent
 load_dotenv(dotenv_path=ENV_PATH)
 
 
@@ -156,6 +158,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -260,3 +263,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MONGODB_URI = os.environ.get("MONGODB_URI", "mongodb://root:examplepass@mongo:27017/")
+MONGODB_DB_NAME = os.environ.get("MONGODB_DB_NAME", "production_data")
+
+KAFKA_BOOTSTRAP_SERVERS = os.environ.get("KAFKA_BOOTSTRAP_SERVERS", "kafka:29092").split(",")
+KAFKA_INGESTION_TOPIC = os.environ.get("KAFKA_INGESTION_TOPIC", "production_data_ingest")
+KAFKA_INDICATORS_TOPIC = os.environ.get("KAFKA_INDICATORS_TOPIC", "production_indicators")

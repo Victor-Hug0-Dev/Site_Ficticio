@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   backend:
     build: ./shopflow-backend
@@ -18,6 +16,10 @@ services:
       - "io.portainer.accesscontrol.public=true"
     networks:
       - app-network
+    depends_on: 
+      - postgres
+      - mongo
+      - kafka
 
   frontend:
     image: node:20
@@ -52,8 +54,85 @@ services:
     networks:
       - app-network
 
+  zookeeper:
+      image: confluentinc/cp-zookeeper:7.3.2
+      container_name: zookeeper
+      ports:
+        - "2181:2181"
+      environment:
+        ZOOKEEPER_CLIENT_PORT: 2181
+        ZOOKEEPER_TICK_TIME: 2000
+      volumes:
+        - zookeeper_data:/data
+        - zookeeper_log:/datalog
+      networks:
+        - app-network
+
+  kafka:
+      image: confluentinc/cp-kafka:7.3.2 # Mesma tag de versão do Zookeeper
+      container_name: kafka
+      ports:
+        - "9092:9092" # Porta externa
+      depends_on:
+        - zookeeper
+      environment:
+        KAFKA_BROKER_ID: 1
+        KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+        KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+        KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+        KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
+        KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+        KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 # Ajustar para produção com múltiplos brokers
+        KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 100
+      volumes:
+        - kafka_data:/var/lib/kafka/data
+      networks:
+        - app-network
+
+  mongo:
+      image: mongo:6.0 # Fixar versão é bom
+      container_name: mongodb_server
+      restart: unless-stopped
+      ports:
+        - "27017:27017"
+      environment:
+        MONGO_INITDB_ROOT_USERNAME: root # Use credenciais seguras!
+        MONGO_INITDB_ROOT_PASSWORD: examplepass # Use credenciais seguras!
+      volumes:
+        - mongo_data:/data/db # Persistência
+      networks:
+        - app-network
+
+  # --- NOVO: Worker Consumidor Kafka -> Escritor MongoDB---
+  mongo_writer_worker:
+      build: ./shopflow-backend
+      image: django-image
+      container_name: mongo_writer
+      restart: unless-stopped
+      # Comando para iniciar o worker
+      command: python manage.py run_mongo_writer_worker 
+      volumes:
+        - ./shopflow-backend:/app/shopflow-backend # Acesso ao código
+      env_file:
+        - ./shopflow-backend/.env.development # Precisa das mesmas variáveis de ambiente
+      depends_on:
+        - mongo
+        - kafka
+        - backend # Pode depender do backend se precisar de algo dele, mas geralmente não
+      networks:
+        - app-network
+
+
 volumes:
   postgres_data:
+    driver: local
+  zookeeper_data:
+    driver: local
+  zookeeper_log:
+    driver: local
+  kafka_data:
+    driver: local
+  mongo_data:
     driver: local
 
 networks:

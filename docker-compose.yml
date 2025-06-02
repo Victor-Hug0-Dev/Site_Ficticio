@@ -20,24 +20,6 @@ services:
       - postgres
       - mongo
       - kafka
-
-  frontend:
-    image: node:20
-    container_name: react-web
-    working_dir: /app
-    volumes:
-      - ./shopflow-frontend:/app
-      - /app/node_modules
-      - ./shopflow-frontend/src/assets:/app/src/assets
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
-    ports:
-      - "5173:5173"
-    env_file:
-      - ./shopflow-frontend/.env.development
-    labels:
-      - "io.portainer.accesscontrol.public=true"
-    networks:
-      - app-network
     
   postgres:
     image: postgres:15
@@ -90,14 +72,14 @@ services:
         - app-network
 
   mongo:
-      image: mongo:6.0 # Fixar versão é bom
+      image: mongo:6.0
       container_name: mongodb_server
       restart: unless-stopped
       ports:
         - "27017:27017"
       environment:
-        MONGO_INITDB_ROOT_USERNAME: root # Use credenciais seguras!
-        MONGO_INITDB_ROOT_PASSWORD: examplepass # Use credenciais seguras!
+        MONGO_INITDB_ROOT_USERNAME: root
+        MONGO_INITDB_ROOT_PASSWORD: examplepass
       volumes:
         - mongo_data:/data/db # Persistência
       networks:

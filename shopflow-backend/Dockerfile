@@ -7,10 +7,9 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    default-libmysqlclient-dev \
     pkg-config \
-    libmariadb-dev \
     netcat-openbsd \
+    libpq-dev\
     dos2unix \
     curl \
     gcc \
